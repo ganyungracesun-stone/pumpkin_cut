@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 import numpy as np
 from draw import draw_pumpkin
+import pygame
 
 # -----------------------------
 # 1. Game settings
@@ -51,8 +52,25 @@ options = HandLandmarkerOptions(
     num_hands=1
 )
 
+# --------------------------------
+# Sound setup
+# ---------------------------------
 
+SOUND_DIR = Path(__file__).resolve().parent
 
+MUSIC_PATH = SOUND_DIR / "Halloween_music.mp3"
+SLICE_PATH = SOUND_DIR / "cut_sound.mp3"
+# Initialize sound system
+pygame.mixer.init()
+
+# Load sound effects
+slice_sound = pygame.mixer.Sound(str(SLICE_PATH))
+slice_sound.set_volume(0.8)
+
+# Start background music and loop forever
+pygame.mixer.music.load(str(MUSIC_PATH))
+pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.play(-1)
 
 # -----------------------------
 #  Main game
@@ -206,6 +224,9 @@ def main():
                     if sliced:
                         score += SLICE_SCORE
 
+                        # Play slice sound effect
+                        slice_sound.play()
+
                         # Create a simple burst effect
                         explosions.append({
                             "x": px,
@@ -284,6 +305,10 @@ def main():
                     break
 
     finally:
+
+        pygame.mixer.music.stop()
+        pygame.mixer.quit()
+
         camera.release()
         cv2.destroyAllWindows()
 
